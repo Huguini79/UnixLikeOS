@@ -1,0 +1,63 @@
+#include <include/unix/sched.h>
+
+#define MAX_DESCRIPTORS 8192
+
+struct Gdt
+{
+    unsigned short limit;
+    unsigned short base_low;
+    unsigned char base_mid;
+    unsigned char access_byte;
+    unsigned char flags;
+    unsigned char base_high;
+
+} __attribute__((packed));
+
+struct GdtRegister
+{
+    unsigned short limit;
+    long base;
+
+} __attribute__((packed));
+
+struct GdtRegister gdtr;
+
+struct Gdt gdt_table[MAX_DESCRIPTORS] __attribute__((aligned(8)));
+
+void setGdtDescriptor(long n, unsigned short limit, long base, unsigned char access_byte, unsigned char flags)
+{
+    struct Gdt* Gdt = &gdt_table[n];
+    Gdt->limit = limit;
+    Gdt->base_low = base & 0xFFFF;
+    Gdt->base_mid = base >> 16 & 0xFF;
+    Gdt->access_byte = access_byte;
+    Gdt->flags = flags;
+    Gdt->base_high = base >> 24 & 0xFF;
+}
+
+void setTSSDescriptor(struct task_struct* task)
+{
+    setGdtDescriptor(task->pid+3, sizeof(task->tss) - 1, (long)&task->tss, 0x89, 0x00);
+}
+
+void GdtInstall()
+{
+    setGdtDescriptor(0, 0, 0, 0, 0);
+    setGdtDescriptor(1, 0xFFFF, 0, 0x9B, 0xCF);
+    setGdtDescriptor(2, 0xFFFF, 0, 0x93, 0xCF);
+    struct tss tss;
+    tss.esp0 = 0x600000;
+    tss.ss0 = 0x10;
+    setGdtDescriptor(3, sizeof(tss) - 1, (long)&tss, 0x89, 0x00);
+
+    gdtr.limit = sizeof(gdt_table) - 1;
+    gdtr.base = (long)gdt_table;
+
+    __asm__ volatile ("lgdt %0" :: "m"(gdtr));
+    unsigned short selector = 3 * 8;
+    __asm__ volatile (
+        "mov %0, %%ax\n\t"
+        "ltr %%ax\n\t"
+        :: "m"(selector)
+    );
+}
