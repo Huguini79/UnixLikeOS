@@ -1,2 +1,2 @@
 <h1>UnixLikeOS</h1>
-<img width="724" height="460" alt="image" src="https://github.com/user-attachments/assets/9f76c364-59e5-4bcb-bf06-d8e8d29eb8d0" />
+<img width="724" height="466" alt="image" src="https://github.com/user-attachments/assets/6dafc2d2-a887-43a2-a585-354730aa99a2" />
