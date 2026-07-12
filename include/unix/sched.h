@@ -1,6 +1,8 @@
 #ifndef SCHED_H
 #define SCHED_H
 
+#include <include/unix/signal.h>
+
 enum State
 {
     Ready,
@@ -41,6 +43,12 @@ struct tss
 
 } __attribute__((packed));
 
+struct sigaction
+{
+    long signal;
+    void* handler;
+};
+
 struct task_struct
 {
     long pid;
@@ -48,6 +56,7 @@ struct task_struct
     long signal;
     long alarm;
     enum State state;
+    struct sigaction sigactions[32];
     struct tss tss; /* Hardware multitasking is better than software multitasking! Is more engineering than software multitasking */
 };
 

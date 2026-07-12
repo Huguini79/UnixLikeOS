@@ -40,6 +40,11 @@ void createWindow(long start_x, long end_x, long start_y, long end_y)
 		// video_mem[(start_y * 80) + start_x+8] = 0x12 << 8 | '4';
 }
 
+void alrm_handler()
+{
+	printk("ALARM!");
+}
+
 void proc0()
 {while(1)__asm__ volatile ("sti");}
 
@@ -55,6 +60,7 @@ void proc3()
 void proc4()
 {
 	alarm(10);
+	signal(SIGALRM, alrm_handler);
 	while (1)
 	{
 		createWindow(50, 80, 0, 16);

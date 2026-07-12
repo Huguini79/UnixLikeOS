@@ -38,6 +38,7 @@
 #define SIGUNUSED 31
 
 void sendsig(struct task_struct* task, long signal);
+void signal(long signal, void* handler);
 void psig();
 
 #endif
