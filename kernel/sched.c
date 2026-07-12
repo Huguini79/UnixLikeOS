@@ -1,5 +1,6 @@
 #include <include/unix/sched.h>
 #include <include/unix/gdt.h>
+#include <include/libc/string.h>
 
 #define CODE_SELECTOR 0x08
 #define DATA_SELECTOR 0x10
@@ -51,7 +52,6 @@ void schedule()
 {
     if (tasks[current->pid+1].state != Zombie)
     {
-
         if (current->signal != 0)
         {
             psig();
@@ -81,14 +81,21 @@ void schedule()
     
     } else
     {
-        for (long i = 0; i < 64; ++i)
+        long cur_pid = -1;
+        for (long i = 1; i < 64; ++i)
         {
-            if (tasks[current->pid+i].state != Zombie)
+            if (tasks[(current->pid+i) % 64].tss.eip != 0 && tasks[(current->pid+i) % 64].state != Zombie)
             {
-                next = &tasks[current->pid+i];
+                cur_pid = tasks[(current->pid+i) % 64].pid;
+                current = &tasks[cur_pid];
                 break;
             }
         }
+
+        if (cur_pid == -1)
+            current = &tasks[0];
+
+        exec(current);
     }
 }
 
