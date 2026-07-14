@@ -1,4 +1,4 @@
-OBJECT_FILES = build/main.o build/entry.asm.o build/ioport.asm.o build/console.o build/printk.o build/gdt.o build/pic.o build/traps.o build/sched.o build/panic.o build/signal.o build/keyboard.o build/alarm.o
+OBJECT_FILES = build/main.o build/entry.asm.o build/ioport.asm.o build/console.o build/printk.o build/gdt.o build/pic.o build/traps.o build/sched.o build/panic.o build/signal.o build/keyboard.o build/alarm.o build/time.o
 
 CC_FLAGS = -c -I./ -m32 -ffreestanding -nostdlib -fno-stack-protector -fno-pie
 AS_FLAGS = -f elf32
@@ -10,7 +10,7 @@ CC = gcc $(CC_FLAGS)
 AS = nasm $(AS_FLAGS)
 LD = ld $(LD_FLAGS)
 GRUB-MKRESCUE = grub-mkrescue -o $(TARGET) iso/
-QEMU = qemu-system-x86_64
+QEMU = qemu-system-x86_64 -rtc base=localtime
 
 all:
 	clear
@@ -31,6 +31,7 @@ all:
 	$(CC) kernel/panic.c -o build/panic.o
 	$(CC) kernel/signal.c -o build/signal.o
 	$(CC) kernel/alarm.c -o build/alarm.o
+	$(CC) kernel/time.c -o build/time.o
 
 	$(LD)
 

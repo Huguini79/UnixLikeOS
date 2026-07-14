@@ -29,20 +29,25 @@ void psig()
 
     } else if (current->signal & (1U << SIGINT))
     {
-        printk("* SIGINT for process with PID=");
-        itoa(current->pid, buf, 10);
-        printk(buf);
-        printk(" *\n");
-        current->signal &= ~(1U << SIGINT);
+        if (current->sigactions[SIGINT].handler == 0)
+        {
+            printk("* SIGINT for process with PID=");
+            itoa(current->pid, buf, 10);
+            printk(buf);
+            printk(" *\n");
+            current->signal &= ~(1U << SIGINT);
+        
+        } else
+        {
+            void (*action)(void) = (void(*)(void))current->sigactions[SIGINT].handler;
+            action();
+        }
 
     } else if (current->signal & (1U << SIGALRM))
     {
         if (current->sigactions[SIGALRM].handler == 0)
         {
-            printk("* SIGALRM for process with PID=");
-            itoa(current->pid, buf, 10);
-            printk(buf);
-            printk(" *\n");
+            current->tss.eip = 0;
         } else
         {
             void (*action)(void) = (void(*)(void))current->sigactions[SIGALRM].handler;

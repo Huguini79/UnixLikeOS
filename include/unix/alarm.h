@@ -12,5 +12,6 @@ struct callout
 extern struct callout callouts[64];
 
 void alarm(long s);
+void sleep(long s);
 
 #endif

@@ -7,6 +7,12 @@
 #include <include/unix/sched.h>
 #include <include/unix/signal.h>
 #include <include/unix/alarm.h>
+#include <include/unix/time.h>
+
+#include <include/libc/string.h>
+
+#include <stdint.h>
+#include <stddef.h>
 
 struct task_struct* process0;
 struct task_struct* process1;
@@ -25,24 +31,51 @@ void createWindow(long start_x, long end_x, long start_y, long end_y)
 		{
 			for (long j = start_x; j < end_x; ++j)
 			{
-				video_mem[(i * 80) + j] = 0xF0 << 8 | ' ';
+				video_mem[(i * 80) + j] = 0x4F << 8 | ' ';
 			}
 		}
-		
-		// video_mem[(start_y * 80) + start_x] = 0x12 << 8 | 'P';
-		// video_mem[(start_y * 80) + start_x+1] = 0x12 << 8 | 'R';
-		// video_mem[(start_y * 80) + start_x+2] = 0x12 << 8 | 'O';
-		// video_mem[(start_y * 80) + start_x+3] = 0x12 << 8 | 'C';
-		// video_mem[(start_y * 80) + start_x+4] = 0x12 << 8 | 'E';
-		// video_mem[(start_y * 80) + start_x+5] = 0x12 << 8 | 'S';
-		// video_mem[(start_y * 80) + start_x+6] = 0x12 << 8 | 'S';
-		// video_mem[(start_y * 80) + start_x+7] = 0x12 << 8 | ' ';
-		// video_mem[(start_y * 80) + start_x+8] = 0x12 << 8 | '4';
 }
 
-void alrm_handler()
+void clearWindow(long start_x, long end_x, long start_y, long end_y)
 {
-	printk("ALARM!");
+	for (long j = start_x; j < end_x; ++j)
+		{
+			video_mem[start_y*80 + j] = 0x3F << 8 | ' ';
+		}
+
+		for (long i = start_y+1; i < end_y; ++i)
+		{
+			for (long j = start_x; j < end_x; ++j)
+			{
+				video_mem[(i * 80) + j] = 0x3F << 8 | ' ';
+			}
+		}
+}
+
+void Label(const char* str, int xx, int yy)
+{
+	size_t len = strlen(str);
+	long my_x = xx;
+	long my_y = yy;
+	for (long i = 0; i < len; ++i)
+	{
+		video_mem[(my_y * 80) + my_x] = 0x2F << 8 | str[i];
+		my_x++;
+	}
+}
+
+void alrm_term_handler1()
+{
+	current->state = Zombie;
+	current->tss.eip = 0;
+	clearWindow(0, 30, 0, 16);
+}
+
+void alrm_term_handler2()
+{
+	current->state = Zombie;
+	current->tss.eip = 0;
+	clearWindow(50, 80, 0, 16);
 }
 
 void proc0()
@@ -51,19 +84,25 @@ void proc0()
 void proc1()
 {}
 
-void proc2()
-{alarm(12);while(1) {createWindow(0, 30, 0, 16);__asm__ volatile ("sti");}}
-
 void proc3()
-{}
+{signal(SIGINT, alrm_term_handler1);while(1) {createWindow(0, 30, 0, 16); Label("Third process!", 0, 1); for (volatile int i = 0; i < 100000; ++i) {}__asm__ volatile ("sti");}}
+
+void proc2()
+{
+	char buf[16];
+	printk("Hello World!");
+}
 
 void proc4()
 {
-	alarm(10);
-	signal(SIGALRM, alrm_handler);
+	// alarm(4);
+	// signal(SIGALRM, alrm_term_handler2);
+	signal(SIGINT, alrm_term_handler2);
 	while (1)
 	{
 		createWindow(50, 80, 0, 16);
+		Label("Fourth process!", 50, 1);
+		    for (volatile int i = 0; i < 100000; ++i) {}
 		__asm__ volatile ("sti");
 	}
 }

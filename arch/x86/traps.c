@@ -99,6 +99,27 @@ void clock_handler()
 	schedule();
 }
 
+void invalid_tss()
+{
+	panic("* KERNEL PANIC - Invalid TSS *");
+}
+
+void general_protection()
+{
+	panic("* KERNEL PANIC - General Protection Fault #GP *");
+}
+
+void mouse_handler()
+{
+	unsigned char status = insb(0x64);
+	if ((status & 0x01) && status & (1 << 5))
+	{
+		printk("MOUSE!");
+	}
+	outb(0xA0, 0x20);
+	outb(0x20, 0x20);
+}
+
 void keyboard_handler()
 {
 	keyboard_handler_ext();
@@ -109,8 +130,11 @@ void IdtInstall()
 {
 	setIdtDescriptor(0, 0x8E, divide_by_zero_error);
 	setIdtDescriptor(0x08, 0x8E, double_fault);
+	setIdtDescriptor(0x10, 0x8E, invalid_tss);
+	setIdtDescriptor(0x13, 0x8E, general_protection);
 	setIdtDescriptor(0x20, 0x8E, clock_handler);
 	setIdtDescriptor(0x21, 0x8E, keyboard_handler);
+	setIdtDescriptor(0x2C, 0x8E, mouse_handler);
 
 	idtr.limit = sizeof(idt_table) - 1;
 	idtr.base = (long)idt_table;

@@ -1,10 +1,16 @@
 #include <include/unix/printk.h>
 #include <include/unix/console.h>
-#include <include/libc/string.h>
 #include <include/unix/ioport.h>
+#include <include/unix/signal.h>
+
+#include <include/libc/string.h>
+
+#include <stdbool.h>
 
 char keyboard_buffer[1024];
 long pos = 0;
+
+bool ctrl_pressed = false;
 
 void addCharacter(char c)
 {
@@ -12,12 +18,80 @@ void addCharacter(char c)
     keyboard_buffer[pos] = '\0';
 }
 
+char* monthToString(unsigned char month)
+{
+    switch(month)
+    {
+        case 1:
+            return "June";
+            break;
+
+        case 2:
+            return "February";
+            break;
+
+        case 3:
+            return "March";
+            break;
+
+        case 4:
+            return "April";
+            break;
+
+        case 5:
+            return "May";
+            break;
+
+        case 6:
+            return "June";
+            break;
+
+        case 7:
+            return "July";
+            break;
+
+        case 8:
+            return "August";
+            break;
+
+        case 9:
+            return "September";
+            break;
+
+        case 10:
+            return "October";
+            break;
+
+        case 11:
+            return "November";
+            break;
+
+        case 12:
+            return "December";
+            break;
+
+        default:
+            return "None";
+            break;
+    }
+}
+
 void keyboard_handler_ext()
 {
     unsigned char scancode = insb(0x60);
     if (scancode == 0x1E) {printk("a"); addCharacter('a');}
     if (scancode == 0x30) {printk("b"); addCharacter('b');}
-    if (scancode == 0x2E) {printk("c"); addCharacter('c');}
+    if (scancode == 0x2E) {
+        if (!ctrl_pressed)
+        {
+            printk("c"); addCharacter('c');
+        
+        } else
+        {
+            printk("^C");
+            sendsig(current, SIGINT);
+        }
+    }
     if (scancode == 0x20) {printk("d"); addCharacter('d');}
     if (scancode == 0x12) {printk("e"); addCharacter('e');}
     if (scancode == 0x21) {printk("f"); addCharacter('f');}
@@ -56,6 +130,16 @@ void keyboard_handler_ext()
     if (scancode == 0x27) {printk(";"); addCharacter(';');}
     if (scancode == 0x0F) {printk("     "); addCharacter(' ');}
 
+    if (scancode == 0x1D)
+    {
+        ctrl_pressed = true;
+    }
+
+    if (scancode == 0x9D)
+    {
+        ctrl_pressed = false;
+    }
+
     if (scancode == 0x1C)
     {
         if (strcmp(keyboard_buffer, "clear") == 0)
@@ -66,7 +150,32 @@ void keyboard_handler_ext()
         {
             printk("\n");
 
-        } else
+        } else if (strcmp(keyboard_buffer, "date") == 0)
+        {
+            printk("\n");
+            char buf[16];
+            const char* month = monthToString(bcd_to_bin(cmos_read(0x08)));
+            printk(month);
+            printk(" ");
+            unsigned char day_of_month = bcd_to_bin(cmos_read(0x07));
+            itoa(day_of_month, buf, 10);
+            printk(buf);
+            printk(" ");
+            unsigned char hours = bcd_to_bin(cmos_read(0x04));
+            itoa(hours, buf, 10);
+            printk(buf);
+            printk(":");
+            unsigned char minutes = bcd_to_bin(cmos_read(0x02));
+            itoa(minutes, buf, 10);
+            printk(buf);
+            printk(":");
+            unsigned char seconds = bcd_to_bin(cmos_read(0x00));
+            itoa(seconds, buf, 10);
+            printk(buf);
+            printk("\n");
+        }
+        
+        else
         {
             printk("\n");
             printk(keyboard_buffer);

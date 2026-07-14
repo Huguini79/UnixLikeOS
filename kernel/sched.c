@@ -52,11 +52,6 @@ void schedule()
 {
     if (tasks[current->pid+1].state != Zombie)
     {
-        if (current->signal != 0)
-        {
-            psig();
-        }
-
         if (tasks[current->pid+1].tss.eip != 0)
         {
             next = &tasks[current->pid+1];
@@ -77,7 +72,15 @@ void schedule()
         current = next;
         current->state = Running;
 
-        exec(current);
+        if (current->signal != 0)
+        {
+            psig();
+        }
+
+        if (current->tss.eip != 0)
+        {
+            exec(current);
+        }
     
     } else
     {
