@@ -75,7 +75,7 @@ void alrm_term_handler2()
 {
 	current->state = Zombie;
 	current->tss.eip = 0;
-	clearWindow(50, 80, 0, 16);
+	clearWindow(60, 80, 0, 10);
 }
 
 void proc0()
@@ -85,7 +85,7 @@ void proc1()
 {}
 
 void proc3()
-{signal(SIGINT, alrm_term_handler1);while(1) {createWindow(0, 30, 0, 16); Label("Third process!", 0, 1); for (volatile int i = 0; i < 100000; ++i) {}__asm__ volatile ("sti");}}
+{signal(SIGINT, alrm_term_handler1);while(1) {createWindow(0, 20, 0, 5); Label("Third process!", 0, 1); for (volatile int i = 0; i < 100000; ++i) {}__asm__ volatile ("sti");}}
 
 void proc2()
 {
@@ -100,8 +100,25 @@ void proc4()
 	signal(SIGINT, alrm_term_handler2);
 	while (1)
 	{
-		createWindow(50, 80, 0, 16);
-		Label("Fourth process!", 50, 1);
+		createWindow(60, 80, 0, 5);
+        char buf[16];    
+		unsigned char day_of_month = bcd_to_bin(cmos_read(0x07));
+            itoa(day_of_month, buf, 10);
+            Label(buf, 60, 1);
+            Label(" ", 62, 1);
+            unsigned char hours = bcd_to_bin(cmos_read(0x04));
+            itoa(hours, buf, 10);
+            Label(buf, 64, 1);
+            Label(":", 66, 1);
+            unsigned char minutes = bcd_to_bin(cmos_read(0x02));
+            itoa(minutes, buf, 10);
+            Label(buf, 67, 1);
+            Label(":", 69, 1);
+            unsigned char seconds = bcd_to_bin(cmos_read(0x00));
+            itoa(seconds, buf, 10);
+            Label(buf, 70, 1);
+			const char* month = monthToString(bcd_to_bin(cmos_read(0x08)));
+		Label(month, 73, 1);
 		    for (volatile int i = 0; i < 100000; ++i) {}
 		__asm__ volatile ("sti");
 	}
