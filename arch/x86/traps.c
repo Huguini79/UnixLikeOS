@@ -126,8 +126,8 @@ volatile long time_ticks = 0;
 void clock_handler()
 {
 	outb(0x20, 0x20);
-	ticks += 7;
-	time_ticks += 7;
+	ticks += 6;
+	time_ticks += 6;
 
 	if (time_ticks >= 100)
 	{
