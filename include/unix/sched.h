@@ -57,10 +57,11 @@ struct task_struct
     long alarm;
     enum State state;
     struct sigaction sigactions[32];
-    struct tss tss; /* Hardware multitasking is better than software multitasking! Is more engineering than software multitasking */
+    struct tss tss;
 };
 
 extern struct task_struct tasks[64];
+extern struct task_struct ready[64];
 extern struct task_struct* current;
 extern struct task_struct* next;
 

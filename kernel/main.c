@@ -13,6 +13,7 @@
 
 #include <stdint.h>
 #include <stddef.h>
+#include <stdbool.h>
 
 struct task_struct* process0;
 struct task_struct* process1;
@@ -93,39 +94,60 @@ void proc2()
 	printk("Hello World!");
 }
 
+bool checkUIP()
+{
+	outb(0x70, 0x0A);
+	if (insb(0x71) & (1 << 7))
+	{
+		return true;
+	
+	} else
+	{
+		return false;
+	}
+}
+
 void proc4()
 {
 	// alarm(4);
 	// signal(SIGALRM, alrm_term_handler2);
+	char buf[16];
 	signal(SIGINT, alrm_term_handler2);
-	while (1)
-	{
-		createWindow(60, 80, 0, 5);
-        char buf[16];    
-		unsigned char day_of_month = bcd_to_bin(cmos_read(0x07));
-            itoa(day_of_month, buf, 10);
-            Label(buf, 60, 1);
-            Label(" ", 62, 1);
-            unsigned char hours = bcd_to_bin(cmos_read(0x04));
-            itoa(hours, buf, 10);
-            Label(buf, 64, 1);
-            Label(":", 66, 1);
-            unsigned char minutes = bcd_to_bin(cmos_read(0x02));
-            itoa(minutes, buf, 10);
-            Label(buf, 67, 1);
-            Label(":", 69, 1);
-            unsigned char seconds = bcd_to_bin(cmos_read(0x00));
-            itoa(seconds, buf, 10);
-            Label(buf, 70, 1);
-			const char* month = monthToString(bcd_to_bin(cmos_read(0x08)));
-		Label(month, 73, 1);
-		    for (volatile int i = 0; i < 100000; ++i) {}
-		__asm__ volatile ("sti");
-	}
+	// while (1)
+	// {
+		// createWindow(60, 80, 0, 5);
+		// // if (checkUIP())
+		// {
+			
+		// } else
+		// {
+			// time_read();
+		while(1)
+		{
+				createWindow(60, 80, 0, 5);
+				itoa(Time.days, buf, 10);
+				Label(buf, 60, 1);
+				Label(" ", 62, 1);
+				itoa(Time.hours, buf, 10);
+				Label(buf, 63, 1);
+				Label(":", 65, 1);
+				itoa(Time.minutes, buf, 10);
+				Label(buf, 66, 1);
+				Label(":", 68, 1);
+				itoa(Time.seconds, buf, 10);
+				Label(buf, 69, 1);
+				Label(" ", 71, 1);
+				const char* month = monthToString(Time.months);
+				Label(month, 73, 1);
+				for (volatile int i = 0; i < 100000; ++i) {}
+				__asm__ volatile ("sti");
+		}
+	//}
 }
 
 void kernel_init()
 {
+	time_init();
 	remapPIC();
 	GdtInstall();
 	IdtInstall();
@@ -135,5 +157,11 @@ void kernel_init()
 	process2 = initProc(2, proc2);
 	process3 = initProc(3, proc3);
 	process4 = initProc(4, proc4);
+	
 	__asm__ volatile ("sti");
+
+	while(1)
+	{
+		__asm__ volatile ("sti");
+	}
 }

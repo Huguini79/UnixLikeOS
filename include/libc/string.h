@@ -39,6 +39,20 @@ static inline int strcmp(const char* str1, const char* str2)
     return 0;
 }
 
+static inline void* memcpy(void* dest, const void* src, size_t size)
+{
+    char* d = (char*)dest;
+    const char* s = (const char*)src;
+
+    for (size_t i = 0; i < size; ++i)
+    {
+        d[i] = s[i];
+    }
+
+    return dest;
+
+}
+
 /* COPIED FROM OSDEV https://wiki.osdev.org/VGA_Text_Mode */
 static inline char * itoa( int value, char * str, int base )
 {

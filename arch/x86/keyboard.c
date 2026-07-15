@@ -2,6 +2,7 @@
 #include <include/unix/console.h>
 #include <include/unix/ioport.h>
 #include <include/unix/signal.h>
+#include <include/unix/time.h>
 
 #include <include/libc/string.h>
 
@@ -154,23 +155,19 @@ void keyboard_handler_ext()
         {
             printk("\n");
             char buf[16];
-            const char* month = monthToString(bcd_to_bin(cmos_read(0x08)));
+            const char* month = monthToString(Time.months);
             printk(month);
             printk(" ");
-            unsigned char day_of_month = bcd_to_bin(cmos_read(0x07));
-            itoa(day_of_month, buf, 10);
+            itoa(Time.days, buf, 10);
             printk(buf);
             printk(" ");
-            unsigned char hours = bcd_to_bin(cmos_read(0x04));
-            itoa(hours, buf, 10);
+            itoa(Time.hours, buf, 10);
             printk(buf);
             printk(":");
-            unsigned char minutes = bcd_to_bin(cmos_read(0x02));
-            itoa(minutes, buf, 10);
+            itoa(Time.minutes, buf, 10);
             printk(buf);
             printk(":");
-            unsigned char seconds = bcd_to_bin(cmos_read(0x00));
-            itoa(seconds, buf, 10);
+            itoa(Time.seconds, buf, 10);
             printk(buf);
             printk("\n");
         }

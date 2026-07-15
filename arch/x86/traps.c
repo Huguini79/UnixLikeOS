@@ -5,6 +5,7 @@
 #include <include/unix/keyboard.h>
 #include <include/unix/signal.h>
 #include <include/unix/alarm.h>
+#include <include/unix/time.h>
 
 struct Idt
 {
@@ -71,7 +72,42 @@ void setIdtDescriptor(long vector, unsigned char type_attributes, void* isr)
 
 void divide_by_zero_error()
 {
-	printk("Divide by zero error\n");
+	panic("Divide by zero error\n");
+}
+
+void debug()
+{
+	panic("* KERNEL PANIC - DEBUG *");
+}
+
+void nmi()
+{
+	panic("* KERNEL PANIC - NMI *");
+}
+
+void int3()
+{
+	panic("* KERNEL PANIC - INT3 *");
+}
+
+void overflow()
+{
+	panic("* KERNEL PANIC - OVERFLOW *");
+}
+
+void bounds()
+{
+	panic("* KERNEL PANIC - BOUNDS *");
+}
+
+void invalid_op()
+{
+	panic("* KERNEL PANIC - INVALID OP *");
+}
+
+void device_not_available()
+{
+	panic("* KERNEL PANIC - DEVICE NOT AVAILABLE *");
 }
 
 void double_fault()
@@ -79,12 +115,43 @@ void double_fault()
 	panic("* KERNEL PANIC - Double Fault #DF *");
 }
 
+void coprocessor_segment_overrun()
+{
+	panic("* KERNEL PANIC - Coprocessor Segment Overrun *");
+}
+
 volatile long ticks = 0;
+volatile long time_ticks = 0;
 
 void clock_handler()
 {
 	outb(0x20, 0x20);
 	ticks += 7;
+	time_ticks += 7;
+
+	if (time_ticks >= 100)
+	{
+		Time.seconds++;
+		if (Time.seconds == 60)
+		{
+			Time.seconds = 0;
+			Time.minutes++;
+		}
+		if (Time.minutes == 60)
+		{
+			Time.minutes = 0;
+			Time.hours++;
+		}
+
+		if (Time.hours == 24)
+		{
+			Time.hours = 0;
+			Time.minutes = 0;
+			Time.seconds = 0;
+		}
+		time_ticks = 0;
+	}
+
 	for (long i = 0; i < 64; ++i)
 	{
 		if (callouts[i].ticks != 0)
@@ -104,9 +171,34 @@ void invalid_tss()
 	panic("* KERNEL PANIC - Invalid TSS *");
 }
 
+void segment_not_present()
+{
+	panic("* KERNEL PANIC - Segment not present *");
+}
+
+void stack_segment()
+{
+	panic("* KERNEL PANIC - Stack Segment *");
+}
+
 void general_protection()
 {
 	panic("* KERNEL PANIC - General Protection Fault #GP *");
+}
+
+void page_fault()
+{
+	panic("* KERNEL PANIC - Page Fault #PF *");
+}
+
+void reserved()
+{
+	panic("* KERNEL PANIC - Reserved *");
+}
+
+void coprocessor_error()
+{
+	panic("* KERNEL PANIC - Coprocessor error *");
 }
 
 void mouse_handler()
@@ -129,12 +221,25 @@ void keyboard_handler()
 void IdtInstall()
 {
 	setIdtDescriptor(0, 0x8E, divide_by_zero_error);
+	setIdtDescriptor(0x01, 0x8E, debug);
+	setIdtDescriptor(0x02, 0x8E, nmi);
+	setIdtDescriptor(0x03, 0x8E, int3);
+	setIdtDescriptor(0x04, 0x8E, overflow);
+	setIdtDescriptor(0x05, 0x8E, bounds);
+	setIdtDescriptor(0x06, 0x8E, invalid_op);
+	setIdtDescriptor(0x07, 0x8E, device_not_available);
 	setIdtDescriptor(0x08, 0x8E, double_fault);
+	setIdtDescriptor(0x09, 0x8E, coprocessor_segment_overrun);
 	setIdtDescriptor(0x10, 0x8E, invalid_tss);
+	setIdtDescriptor(0x11, 0x8E, segment_not_present);
+	setIdtDescriptor(0x12, 0x8E, stack_segment);
 	setIdtDescriptor(0x13, 0x8E, general_protection);
+	setIdtDescriptor(0x14, 0x8E, page_fault);
+	setIdtDescriptor(0x15, 0x8E, reserved);
+	setIdtDescriptor(0x16, 0x8E, coprocessor_error);
 	setIdtDescriptor(0x20, 0x8E, clock_handler);
 	setIdtDescriptor(0x21, 0x8E, keyboard_handler);
-	setIdtDescriptor(0x2C, 0x8E, mouse_handler);
+	// setIdtDescriptor(0x2C, 0x8E, mouse_handler);
 
 	idtr.limit = sizeof(idt_table) - 1;
 	idtr.base = (long)idt_table;

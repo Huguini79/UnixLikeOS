@@ -6,6 +6,7 @@
 #define DATA_SELECTOR 0x10
 
 struct task_struct tasks[64] = {0};
+struct task_struct ready[64] = {0};
 struct task_struct* current = &tasks[0];
 struct task_struct* next = &tasks[0];
 
