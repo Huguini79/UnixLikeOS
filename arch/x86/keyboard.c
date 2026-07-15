@@ -24,7 +24,7 @@ char* monthToString(unsigned char month)
     switch(month)
     {
         case 1:
-            return "June";
+            return "January";
             break;
 
         case 2:

@@ -1,4 +1,4 @@
-OBJECT_FILES = build/main.o build/entry.asm.o build/ioport.asm.o build/console.o build/printk.o build/gdt.o build/pic.o build/traps.o build/sched.o build/panic.o build/signal.o build/keyboard.o build/alarm.o build/time.o
+OBJECT_FILES = build/main.o build/entry.asm.o build/ioport.asm.o build/console.o build/printk.o build/gdt.o build/pic.o build/traps.o build/sched.o build/panic.o build/signal.o build/keyboard.o build/alarm.o build/time.o build/mouse.o
 
 CC_FLAGS = -c -I./ -m32 -ffreestanding -nostdlib -fno-stack-protector -fno-pie
 AS_FLAGS = -f elf32
@@ -23,6 +23,7 @@ all:
 	$(CC) arch/x86/pic.c -o build/pic.o
 	$(CC) arch/x86/traps.c -o build/traps.o
 	$(CC) arch/x86/keyboard.c -o build/keyboard.o
+	$(CC) arch/x86/mouse.c -o build/mouse.o
 
 	$(CC) kernel/console.c -o build/console.o
 	$(CC) kernel/printk.c -o build/printk.o

@@ -201,12 +201,66 @@ void coprocessor_error()
 	panic("* KERNEL PANIC - Coprocessor error *");
 }
 
+unsigned char mouse_cycle = 0;
+unsigned char mouse_packet[3];
+
+long mouse_x = 42;
+long mouse_y = 15;
+
 void mouse_handler()
 {
 	unsigned char status = insb(0x64);
 	if ((status & 0x01) && status & (1 << 5))
 	{
-		printk("MOUSE!");
+		unsigned char data = insb(0x60);
+		
+		if (mouse_cycle == 0)
+		{
+			if (!(data & 0x08))return;
+			mouse_packet[0] = data;
+			mouse_cycle++;
+
+		} else if (mouse_cycle == 1)
+		{
+			mouse_packet[1] = data;
+			mouse_cycle++;
+
+		} else if (mouse_cycle == 2)
+		{
+			mouse_packet[2] = data;
+
+			if (mouse_packet[0] & 0x80 || mouse_packet[0] & 0x40)
+			{
+				mouse_cycle = 0;
+				return;
+			}
+
+			put_cxy(' ', mouse_x, mouse_y);
+
+			if (mouse_packet[0] & (1 << 0))
+			{
+				printk("Left BTN");	
+			
+			} else if (mouse_packet[0] & (1 << 1))
+			{
+				printk("Right BTN");
+			}
+
+			long dx = (signed char)mouse_packet[1];
+			long dy = (signed char)mouse_packet[2];
+
+			mouse_x += dx;
+			mouse_y -= dy;
+
+			if (mouse_x >= 79)mouse_x = 79;
+			if (mouse_y >= 25)mouse_y = 25;
+			if (mouse_x <= 0)mouse_x = 0;
+			if (mouse_y <= 0)mouse_y = 0;
+
+			put_cxy('/', mouse_x, mouse_y);
+
+			mouse_cycle = 0;
+		}
 	}
 	outb(0xA0, 0x20);
 	outb(0x20, 0x20);
@@ -239,7 +293,7 @@ void IdtInstall()
 	setIdtDescriptor(0x16, 0x8E, coprocessor_error);
 	setIdtDescriptor(0x20, 0x8E, clock_handler);
 	setIdtDescriptor(0x21, 0x8E, keyboard_handler);
-	// setIdtDescriptor(0x2C, 0x8E, mouse_handler);
+	setIdtDescriptor(0x2C, 0x8E, mouse_handler);
 
 	idtr.limit = sizeof(idt_table) - 1;
 	idtr.base = (long)idt_table;
