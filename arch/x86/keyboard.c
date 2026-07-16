@@ -151,7 +151,24 @@ void keyboard_handler_ext()
         {
             printk("\n");
 
-        } else if (strcmp(keyboard_buffer, "date") == 0)
+        } else if (strcmp(keyboard_buffer, "help") == 0)
+        {
+            printk("\nclear echo date help\n");
+        
+        } else if (strncmp(keyboard_buffer, "echo", 4) == 0)
+        {
+            printk("\n");
+            long i = 4;
+            while(keyboard_buffer[i] != '\0')
+            {
+                i++;
+                put_c(keyboard_buffer[i]);
+            }
+
+            printk("\n");
+        }
+        
+        else if (strcmp(keyboard_buffer, "date") == 0)
         {
             printk("\n");
             char buf[16];

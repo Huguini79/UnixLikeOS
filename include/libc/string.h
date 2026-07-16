@@ -30,7 +30,30 @@ static inline int strcmp(const char* str1, const char* str2)
             return u1 - u2;
         }
 
-        if (u1 == '\0')
+        if (u2 == '\0')
+        {
+            return 0;
+        }
+    }
+
+    return 0;
+}
+
+static inline int strncmp(const char* str1, const char* str2, long n)
+{
+    unsigned char u1, u2;
+
+    for (long i = 0; i < n; ++i)
+    {
+        u1 = (unsigned char)*str1++;
+        u2 = (unsigned char)*str2++;
+
+        if (u1 != u2)
+        {
+            return u1 - u2;
+        }
+
+        if (u2 == '\0')
         {
             return 0;
         }
