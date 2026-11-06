@@ -6,6 +6,7 @@
 #include <include/unix/signal.h>
 #include <include/unix/alarm.h>
 #include <include/unix/time.h>
+#include <include/unix/console.h>
 
 struct Idt
 {

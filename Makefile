@@ -1,6 +1,6 @@
-OBJECT_FILES = build/main.o build/entry.asm.o build/ioport.asm.o build/console.o build/printk.o build/gdt.o build/pic.o build/traps.o build/sched.o build/panic.o build/signal.o build/keyboard.o build/alarm.o build/time.o build/mouse.o
+OBJECT_FILES = build/main.o build/entry.asm.o build/ioport.asm.o build/console.o build/printk.o build/gdt.o build/pic.o build/traps.o build/sched.o build/panic.o build/signal.o build/keyboard.o build/alarm.o build/time.o build/mouse.o build/paging.asm.o build/paging.o
 
-CC_FLAGS = -c -I./ -m32 -ffreestanding -nostdlib -fno-stack-protector -fno-pie
+CC_FLAGS = -c -I./ -m32 -ffreestanding -nostdlib -fno-stack-protector -fno-pie -Wall -Werror -Wno-error=return-type
 AS_FLAGS = -f elf32
 LD_FLAGS = -m elf_i386 -T linker.ld -o iso/boot/kernel $(OBJECT_FILES)
 
@@ -10,7 +10,7 @@ CC = gcc $(CC_FLAGS)
 AS = nasm $(AS_FLAGS)
 LD = ld $(LD_FLAGS)
 GRUB-MKRESCUE = grub-mkrescue -o $(TARGET) iso/
-QEMU = qemu-system-x86_64 -rtc base=localtime
+QEMU = qemu-system-x86_64 -m 1024 -rtc base=localtime
 
 all:
 	clear
@@ -18,6 +18,7 @@ all:
 
 	$(AS) entry.asm -o build/entry.asm.o
 	$(AS) arch/x86/ioport.asm -o build/ioport.asm.o
+	$(AS) kernel/paging.asm -o build/paging.asm.o
 
 	$(CC) arch/x86/gdt.c -o build/gdt.o
 	$(CC) arch/x86/pic.c -o build/pic.o
@@ -28,6 +29,7 @@ all:
 	$(CC) kernel/console.c -o build/console.o
 	$(CC) kernel/printk.c -o build/printk.o
 	$(CC) kernel/main.c -o build/main.o
+	$(CC) kernel/paging.c -o build/paging.o
 	$(CC) kernel/sched.c -o build/sched.o
 	$(CC) kernel/panic.c -o build/panic.o
 	$(CC) kernel/signal.c -o build/signal.o
@@ -39,3 +41,4 @@ all:
 	$(GRUB-MKRESCUE)
 
 	$(QEMU) $(TARGET)
+

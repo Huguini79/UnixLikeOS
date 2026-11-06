@@ -145,20 +145,37 @@ void proc4()
 	//}
 }
 
+extern uint32_t _kernel_end;
+extern void set_kernel_paging();
+
 void kernel_init()
 {
-	time_init();
-	mouse_init();
-	remapPIC();
-	GdtInstall();
-	IdtInstall();
 	ConsoleInstall();
+	printk("Kernel end: %i\n\n", _kernel_end);
+	printk("INICIALIZANDO LA HORA ");
+	time_init();
+	success();
+	printk("INICIALIZANDO DRIVER DE RATON ");
+	mouse_init();
+	success();
+	printk("REMAPEANDO EL PROGRAMADOR DE INTERRUPCIONES (PIC) ");
+	remapPIC();
+	success();
+	printk("INICIALIZANDO LA TABLA GENERAL DE DESCRIPTORES (GDT) ");
+	GdtInstall();
+	success();
+	printk("INICIALIZANDO LA TABLA DE DESCRIPTORES DE INTERRUPCIONES (IDT) ");
+	IdtInstall();
+	success();
+	set_kernel_paging();
+	/*
 	process0 = initProc(0, proc0);
 	process1 = initProc(1, proc1);
 	process2 = initProc(2, proc2);
 	process3 = initProc(3, proc3);
 	process4 = initProc(4, proc4);
-	
+	*/
+
 	__asm__ volatile ("sti");
 
 	while(1)

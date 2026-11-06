@@ -4,6 +4,8 @@
 void ConsoleInstall();
 void put_cxy(char c, int x, int y);
 void put_c(char c);
+void printk_color(const char* fmt, unsigned char color);
+void success();
 void clear();
 
 extern unsigned short* video_mem;

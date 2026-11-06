@@ -75,6 +75,45 @@ void put_c(char c)
     }
 }
 
+void printk_color(const char* fmt, uint8_t color)
+{
+		size_t size = strlen(fmt);
+
+		for (size_t i = 0; i < size; ++i)
+		{
+			char c = fmt[i];
+	if (x >= VGA_WIDTH)
+		    {
+		        x = 0;
+		        y++;
+		        update_cursor(x, y);
+		    }
+		
+		    if (y >= VGA_HEIGHT)
+		    {
+		        clear();
+		    }
+		    	
+		    if (c == '\n')
+		    {
+		        x = 0;
+		        y++;
+		        update_cursor(x, y);
+		
+		    } else
+		    {
+		        video_mem[(y * VGA_WIDTH) + x] = color << 8 | c;
+		        x++;
+		        update_cursor(x, y);
+		    }
+		}
+}
+
+void success()
+{
+	printk_color("[ EXITO ]\n", ((0x3) << 4 | 0x0A));
+}
+
 void clear()
 {
     disable_cursor();
