@@ -1,0 +1,306 @@
+
+There are no discarded input sections
+
+Memory Configuration
+
+Name             Origin             Length             Attributes
+*default*        0x00000000         0xffffffff
+
+Linker script and memory map
+
+                0x00100000                        . = 0x100000
+
+.text           0x00100000     0x29e6
+ *(.multiboot)
+ .multiboot     0x00100000        0xc build/entry.asm.o
+ *(.text)
+ .text          0x0010000c      0x672 build/main.o
+                0x001000ef                createWindow
+                0x001001c1                clearWindow
+                0x00100250                createBar
+                0x00100291                Label
+                0x00100307                alrm_term_handler1
+                0x00100338                alrm_term_handler2
+                0x00100369                proc0
+                0x0010036f                proc1
+                0x00100375                proc3
+                0x001003d0                proc2
+                0x001003d6                proc4
+                0x00100541                kernel_init
+ *fill*         0x0010067e        0x2 
+ .text          0x00100680        0x7 build/entry.asm.o
+                0x00100680                start
+ *fill*         0x00100687        0x9 
+ .text          0x00100690       0x41 build/ioport.asm.o
+                0x00100690                insb
+                0x00100699                insw
+                0x001006a3                inl
+                0x001006ac                outb
+                0x001006b8                outw
+                0x001006c5                outl
+ .text          0x001006d1      0x476 build/console.o
+                0x001006f8                ConsoleInstall
+                0x00100710                put_cxy
+                0x00100750                enable_cursor
+                0x001007e7                update_cursor
+                0x00100865                disable_cursor
+                0x00100892                put_c
+                0x0010097b                printk_color
+                0x00100aa5                success
+                0x00100ac0                clear
+ .text          0x00100b47      0x182 build/printk.o
+                0x00100c2a                printk
+ .text          0x00100cc9      0x138 build/gdt.o
+                0x00100cc9                setGdtDescriptor
+                0x00100d39                setTSSDescriptor
+                0x00100d64                GdtInstall
+ .text          0x00100e01       0xbd build/pic.o
+                0x00100e01                remapPIC
+ .text          0x00100ebe      0x6f4 build/traps.o
+                0x00100ebe                setIdtDescriptor
+                0x00100f0f                divide_by_zero_error
+                0x00100f28                debug
+                0x00100f41                nmi
+                0x00100f5a                int3
+                0x00100f73                overflow
+                0x00100f8c                bounds
+                0x00100fa5                invalid_op
+                0x00100fbe                device_not_available
+                0x00100fd7                double_fault
+                0x00100ff0                coprocessor_segment_overrun
+                0x00101009                clock_handler
+                0x00101129                invalid_tss
+                0x00101142                segment_not_present
+                0x0010115b                stack_segment
+                0x00101174                general_protection
+                0x0010118d                page_fault
+                0x001011a6                reserved
+                0x001011bf                coprocessor_error
+                0x001011d8                mouse_handler
+                0x001013e5                keyboard_handler
+                0x00101402                IdtInstall
+ .text          0x001015b2      0x37b build/sched.o
+                0x001015b2                blank
+                0x001015b8                initProc
+                0x0010172a                schedule
+                0x00101903                exec
+ .text          0x0010192d       0x17 build/panic.o
+                0x0010192d                panic
+ .text          0x00101944      0x26d build/signal.o
+                0x00101a00                sendsig
+                0x00101a2c                signal
+                0x00101a56                psig
+ .text          0x00101bb1      0xa3b build/keyboard.o
+                0x00101d17                addCharacter
+                0x00101d4a                monthToString
+                0x00101dc3                keyboard_handler_ext
+ .text          0x001025ec       0x53 build/alarm.o
+                0x001025ec                alarm
+ .text          0x0010263f      0x187 build/time.o
+                0x0010263f                cmos_read
+                0x00102672                bcd_to_bin
+                0x0010269d                time_init
+ .text          0x001027c6      0x13a build/mouse.o
+                0x001027c6                mouse_wait
+                0x0010282e                mouse_read
+                0x00102850                mouse_init
+ .text          0x00102900       0x18 build/paging.asm.o
+                0x00102900                enable_paging
+                0x0010290d                load_page_directory
+ .text          0x00102918       0xce build/paging.o
+                0x00102918                set_kernel_paging
+                0x001029dc                return_page_directory
+
+.iplt           0x001029e6        0x0
+ .iplt          0x001029e6        0x0 build/main.o
+
+.rodata         0x001029e8      0x60e
+ .rodata        0x001029e8      0x150 build/main.o
+ .rodata        0x00102b38        0xb build/console.o
+ *fill*         0x00102b43        0x1 
+ .rodata        0x00102b44       0x48 build/printk.o
+ .rodata        0x00102b8c      0x244 build/traps.o
+ .rodata        0x00102dd0       0x8b build/signal.o
+ *fill*         0x00102e5b        0x1 
+ .rodata        0x00102e5c      0x16c build/keyboard.o
+ .rodata        0x00102fc8       0x2e build/paging.o
+
+.eh_frame       0x00102ff8      0x9b8
+ .eh_frame      0x00102ff8      0x1cc build/main.o
+ .eh_frame      0x001031c4      0x14c build/console.o
+                                0x164 (size before relaxing)
+ .eh_frame      0x00103310       0x60 build/printk.o
+                                 0x78 (size before relaxing)
+ .eh_frame      0x00103370       0x60 build/gdt.o
+                                 0x78 (size before relaxing)
+ .eh_frame      0x001033d0       0x20 build/pic.o
+                                 0x38 (size before relaxing)
+ .eh_frame      0x001033f0      0x2c0 build/traps.o
+                                0x2d8 (size before relaxing)
+ .eh_frame      0x001036b0       0x7c build/sched.o
+                                 0x94 (size before relaxing)
+ .eh_frame      0x0010372c       0x1c build/panic.o
+                                 0x34 (size before relaxing)
+ .eh_frame      0x00103748       0x84 build/signal.o
+                                 0x9c (size before relaxing)
+ .eh_frame      0x001037cc       0xc0 build/keyboard.o
+                                 0xd8 (size before relaxing)
+ .eh_frame      0x0010388c       0x24 build/alarm.o
+                                 0x3c (size before relaxing)
+ .eh_frame      0x001038b0       0x60 build/time.o
+                                 0x78 (size before relaxing)
+ .eh_frame      0x00103910       0x60 build/mouse.o
+                                 0x78 (size before relaxing)
+ .eh_frame      0x00103970       0x40 build/paging.o
+                                 0x58 (size before relaxing)
+
+.rel.dyn        0x001039b0        0x0
+ .rel.got       0x001039b0        0x0 build/main.o
+ .rel.iplt      0x001039b0        0x0 build/main.o
+ .rel.text      0x001039b0        0x0 build/main.o
+
+.data           0x001039b0       0x10
+ *(.data)
+ .data          0x001039b0        0x0 build/main.o
+ .data          0x001039b0        0x0 build/console.o
+ .data          0x001039b0        0x0 build/printk.o
+ .data          0x001039b0        0x0 build/gdt.o
+ .data          0x001039b0        0x0 build/pic.o
+ .data          0x001039b0        0x8 build/traps.o
+                0x001039b0                mouse_x
+                0x001039b4                mouse_y
+ .data          0x001039b8        0x8 build/sched.o
+                0x001039b8                current
+                0x001039bc                next
+ .data          0x001039c0        0x0 build/panic.o
+ .data          0x001039c0        0x0 build/signal.o
+ .data          0x001039c0        0x0 build/keyboard.o
+ .data          0x001039c0        0x0 build/alarm.o
+ .data          0x001039c0        0x0 build/time.o
+ .data          0x001039c0        0x0 build/mouse.o
+ .data          0x001039c0        0x0 build/paging.o
+
+.got            0x001039c0        0x0
+ .got           0x001039c0        0x0 build/main.o
+
+.got.plt        0x001039c0        0x0
+ .got.plt       0x001039c0        0x0 build/main.o
+
+.igot.plt       0x001039c0        0x0
+ .igot.plt      0x001039c0        0x0 build/main.o
+
+.bss            0x00104000   0x42e000
+ *(.bss)
+ .bss           0x00104000       0x18 build/main.o
+                0x00104000                process0
+                0x00104004                process1
+                0x00104008                process2
+                0x0010400c                process3
+                0x00104010                process4
+                0x00104014                max_y
+ .bss           0x00104018    0x10000 build/entry.asm.o
+ .bss           0x00114018        0xc build/console.o
+                0x00114018                video_mem
+                0x0011401c                x
+                0x00114020                y
+ .bss           0x00114024        0x0 build/printk.o
+ *fill*         0x00114024        0x4 
+ .bss           0x00114028    0x10008 build/gdt.o
+                0x00114028                gdtr
+                0x00114030                gdt_table
+ .bss           0x00124030        0x0 build/pic.o
+ .bss           0x00124030      0x814 build/traps.o
+                0x00124030                idtr
+                0x00124038                idt_table
+                0x00124838                ticks
+                0x0012483c                time_ticks
+                0x00124840                mouse_cycle
+                0x00124841                mouse_packet
+ *fill*         0x00124844       0x1c 
+ .bss           0x00124860     0xbe00 build/sched.o
+                0x00124860                tasks
+                0x0012a760                ready
+ .bss           0x00130660        0x0 build/panic.o
+ .bss           0x00130660        0x0 build/signal.o
+ .bss           0x00130660      0x405 build/keyboard.o
+                0x00130660                keyboard_buffer
+                0x00130a60                pos
+                0x00130a64                ctrl_pressed
+ *fill*         0x00130a65       0x1b 
+ .bss           0x00130a80      0x200 build/alarm.o
+                0x00130a80                callouts
+ .bss           0x00130c80       0x20 build/time.o
+                0x00130c80                Time
+ .bss           0x00130ca0        0x0 build/mouse.o
+ *fill*         0x00130ca0      0x360 
+ .bss           0x00131000   0x401000 build/paging.o
+                0x00131000                kernel_page_directory
+                0x00132000                page_table
+                0x00532000                        _kernel_end = .
+                0x00532000                        _end = .
+LOAD build/main.o
+LOAD build/entry.asm.o
+LOAD build/ioport.asm.o
+LOAD build/console.o
+LOAD build/printk.o
+LOAD build/gdt.o
+LOAD build/pic.o
+LOAD build/traps.o
+LOAD build/sched.o
+LOAD build/panic.o
+LOAD build/signal.o
+LOAD build/keyboard.o
+LOAD build/alarm.o
+LOAD build/time.o
+LOAD build/mouse.o
+LOAD build/paging.asm.o
+LOAD build/paging.o
+OUTPUT(iso/boot/kernel elf32-i386)
+
+.comment        0x00000000       0x1f
+ .comment       0x00000000       0x1f build/main.o
+                                 0x20 (size before relaxing)
+ .comment       0x0000001f       0x20 build/console.o
+ .comment       0x0000001f       0x20 build/printk.o
+ .comment       0x0000001f       0x20 build/gdt.o
+ .comment       0x0000001f       0x20 build/pic.o
+ .comment       0x0000001f       0x20 build/traps.o
+ .comment       0x0000001f       0x20 build/sched.o
+ .comment       0x0000001f       0x20 build/panic.o
+ .comment       0x0000001f       0x20 build/signal.o
+ .comment       0x0000001f       0x20 build/keyboard.o
+ .comment       0x0000001f       0x20 build/alarm.o
+ .comment       0x0000001f       0x20 build/time.o
+ .comment       0x0000001f       0x20 build/mouse.o
+ .comment       0x0000001f       0x20 build/paging.o
+
+.note.GNU-stack
+                0x00000000        0x0
+ .note.GNU-stack
+                0x00000000        0x0 build/main.o
+ .note.GNU-stack
+                0x00000000        0x0 build/console.o
+ .note.GNU-stack
+                0x00000000        0x0 build/printk.o
+ .note.GNU-stack
+                0x00000000        0x0 build/gdt.o
+ .note.GNU-stack
+                0x00000000        0x0 build/pic.o
+ .note.GNU-stack
+                0x00000000        0x0 build/traps.o
+ .note.GNU-stack
+                0x00000000        0x0 build/sched.o
+ .note.GNU-stack
+                0x00000000        0x0 build/panic.o
+ .note.GNU-stack
+                0x00000000        0x0 build/signal.o
+ .note.GNU-stack
+                0x00000000        0x0 build/keyboard.o
+ .note.GNU-stack
+                0x00000000        0x0 build/alarm.o
+ .note.GNU-stack
+                0x00000000        0x0 build/time.o
+ .note.GNU-stack
+                0x00000000        0x0 build/mouse.o
+ .note.GNU-stack
+                0x00000000        0x0 build/paging.o

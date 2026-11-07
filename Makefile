@@ -2,7 +2,7 @@ OBJECT_FILES = build/main.o build/entry.asm.o build/ioport.asm.o build/console.o
 
 CC_FLAGS = -c -I./ -m32 -ffreestanding -nostdlib -fno-stack-protector -fno-pie -Wall -Werror -Wno-error=return-type
 AS_FLAGS = -f elf32
-LD_FLAGS = -m elf_i386 -T linker.ld -o iso/boot/kernel $(OBJECT_FILES)
+LD_FLAGS = -m elf_i386 -T linker.ld -Map=kernel.map -o iso/boot/kernel $(OBJECT_FILES)
 
 TARGET = UnixLikeOS.iso
 
@@ -10,7 +10,7 @@ CC = gcc $(CC_FLAGS)
 AS = nasm $(AS_FLAGS)
 LD = ld $(LD_FLAGS)
 GRUB-MKRESCUE = grub-mkrescue -o $(TARGET) iso/
-QEMU = qemu-system-x86_64 -m 1024 -rtc base=localtime
+QEMU = qemu-system-x86_64 -m 4096 -rtc base=localtime
 
 all:
 	clear
@@ -40,5 +40,5 @@ all:
 
 	$(GRUB-MKRESCUE)
 
-	$(QEMU) $(TARGET)
+	$(QEMU) -d cpu_reset $(TARGET)
 

@@ -147,6 +147,7 @@ void proc4()
 
 extern uint32_t _kernel_end;
 extern void set_kernel_paging();
+extern long return_page_directory();
 
 void kernel_init()
 {
@@ -168,13 +169,11 @@ void kernel_init()
 	IdtInstall();
 	success();
 	set_kernel_paging();
-	/*
-	process0 = initProc(0, proc0);
-	process1 = initProc(1, proc1);
-	process2 = initProc(2, proc2);
-	process3 = initProc(3, proc3);
-	process4 = initProc(4, proc4);
-	*/
+	process0 = initProc(0, proc0, (long)return_page_directory());
+	process1 = initProc(1, proc1, (long)return_page_directory());
+	process2 = initProc(2, proc2, (long)return_page_directory());
+	process3 = initProc(3, proc3, (long)return_page_directory());
+	process4 = initProc(4, proc4, (long)return_page_directory());
 
 	__asm__ volatile ("sti");
 

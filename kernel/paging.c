@@ -38,6 +38,12 @@ void set_kernel_paging()
 	enable_paging();
 	success();
 }
+
+long return_page_directory()
+{
+	return (long)kernel_page_directory;
+}
+
 /*
 void set_user_paging()
 {

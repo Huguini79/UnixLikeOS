@@ -15,7 +15,7 @@ void blank()
     while (1)__asm__ volatile ("sti");
 }
 
-struct task_struct* initProc(long pid, void* eip)
+struct task_struct* initProc(long pid, void* eip, long page_directory)
 {
     struct task_struct* newTask = &tasks[pid];
     newTask->pid = pid;
@@ -26,6 +26,7 @@ struct task_struct* initProc(long pid, void* eip)
     newTask->tss.ss0 = 0x10;
     newTask->tss.eip = (long)eip;
     newTask->tss.eflags = 0x202;
+    newTask->tss.cr3 = (long)page_directory;
     newTask->tss.eax = 0;
     newTask->tss.ecx = 0;
     newTask->tss.edx = 0;

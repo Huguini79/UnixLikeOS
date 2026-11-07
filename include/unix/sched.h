@@ -65,7 +65,7 @@ extern struct task_struct ready[64];
 extern struct task_struct* current;
 extern struct task_struct* next;
 
-struct task_struct* initProc(long pid, void* eip);
+struct task_struct* initProc(long pid, void* eip, long page_directory);
 void schedule();
 int exec(struct task_struct* task);
 
