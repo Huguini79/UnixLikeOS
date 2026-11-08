@@ -55,6 +55,9 @@ struct task_struct
     long ppid;
     long signal;
     long alarm;
+    /* We use identity mapping for the kernel, but for user programs, we use lazy loading */
+    long pcb_page_directory[1024] __attribute__((aligned(4096)));
+    long pcb_page_table[1024][1024] __attribute__((aligned(4096)));
     enum State state;
     struct sigaction sigactions[32];
     struct tss tss;
@@ -65,7 +68,7 @@ extern struct task_struct ready[64];
 extern struct task_struct* current;
 extern struct task_struct* next;
 
-struct task_struct* initProc(long pid, void* eip, long page_directory);
+struct task_struct* initProc(long pid, void* eip);
 void schedule();
 int exec(struct task_struct* task);
 

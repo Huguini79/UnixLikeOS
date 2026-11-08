@@ -17,24 +17,25 @@ uint32_t page_table[1024][1024] __attribute__((aligned(4096)));
 
 void set_kernel_paging()
 {
+	long flags = 3;
 	uint8_t* kernel_start_address = (uint8_t*)0x0000;
 	uint32_t offset = 0; // ESTO LO USAMOS PARA AVANZAR DE PÁGINA EN PÁGINA (OFFSET += 4096 bytes -> 4KB (cada página son 4KB)) 
 
-	printk("INICIANDO PAGINACION ");
+	printk("INIT PAGING ");
 	for (int i = 0; i < 1024; i++)
 	{
 		for (int j = 0; j < 1024; j++)
 		{
-			page_table[i][j] = ((uint32_t)kernel_start_address + offset) | 3;
+			page_table[i][j] = ((uint32_t)kernel_start_address + offset) | flags;
 			offset += 4096;
 		}
 
-		kernel_page_directory[i] = ((uint32_t)page_table[i]) | 3;
+		kernel_page_directory[i] = ((uint32_t)page_table[i]) | flags;
 	}
 
 	load_page_directory(kernel_page_directory);
 	success();
-	printk("HABILITANDO PAGINACION ");
+	printk("ENABLE PAGING (PG bit CR0) ");
 	enable_paging();
 	success();
 }

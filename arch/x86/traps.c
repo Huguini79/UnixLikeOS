@@ -8,6 +8,8 @@
 #include <include/unix/time.h>
 #include <include/unix/console.h>
 
+#include <stdbool.h>
+
 struct Idt
 {
 	unsigned short isr_low;
@@ -46,6 +48,8 @@ struct interrupt_frame
 */
 
 struct IdtRegister idtr;
+
+bool init_gui = false;
 
 struct Idt idt_table[256] __attribute__((aligned(8)));
 
@@ -164,7 +168,11 @@ void clock_handler()
 			}
 		}
 	}
-	schedule();
+
+	if (init_gui)
+	{
+		schedule();
+	}
 }
 
 void invalid_tss()
@@ -269,9 +277,24 @@ void mouse_handler()
 
 void keyboard_handler()
 {
+	if (init_gui == false)
+	{
+		init_gui = true;
+		clear();
+		printk("\n\n\n\n\n\n\n\n\n");
+	
+	}
 	keyboard_handler_ext();
 	outb(0x20, 0x20);
 }
+
+void wait_for_enter_gui()
+{
+	printk("\n\nPress any key to enter to GUI...");
+}
+
+extern void page_fault_handler_asm();
+extern void double_fault_handler_asm();
 
 void IdtInstall()
 {
@@ -283,13 +306,13 @@ void IdtInstall()
 	setIdtDescriptor(0x05, 0x8E, bounds);
 	setIdtDescriptor(0x06, 0x8E, invalid_op);
 	setIdtDescriptor(0x07, 0x8E, device_not_available);
-	setIdtDescriptor(0x08, 0x8E, double_fault);
+	setIdtDescriptor(0x08, 0x8E, double_fault_handler_asm);
 	setIdtDescriptor(0x09, 0x8E, coprocessor_segment_overrun);
 	setIdtDescriptor(0x10, 0x8E, invalid_tss);
 	setIdtDescriptor(0x11, 0x8E, segment_not_present);
 	setIdtDescriptor(0x12, 0x8E, stack_segment);
 	setIdtDescriptor(0x13, 0x8E, general_protection);
-	setIdtDescriptor(0x14, 0x8E, page_fault);
+	setIdtDescriptor(0x14, 0x8E, page_fault_handler_asm);
 	setIdtDescriptor(0x15, 0x8E, reserved);
 	setIdtDescriptor(0x16, 0x8E, coprocessor_error);
 	setIdtDescriptor(0x20, 0x8E, clock_handler);

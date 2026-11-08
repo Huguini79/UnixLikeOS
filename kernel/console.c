@@ -111,7 +111,7 @@ void printk_color(const char* fmt, uint8_t color)
 
 void success()
 {
-	printk_color("[ EXITO ]\n", ((0x3) << 4 | 0x0A));
+	printk_color("[ OK ]\n", ((0x3) << 4 | 0x0A));
 }
 
 void clear()

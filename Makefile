@@ -1,4 +1,4 @@
-OBJECT_FILES = build/main.o build/entry.asm.o build/ioport.asm.o build/console.o build/printk.o build/gdt.o build/pic.o build/traps.o build/sched.o build/panic.o build/signal.o build/keyboard.o build/alarm.o build/time.o build/mouse.o build/paging.asm.o build/paging.o
+OBJECT_FILES = build/main.o build/entry.asm.o build/ioport.asm.o build/console.o build/printk.o build/gdt.o build/pic.o build/traps.o build/sched.o build/panic.o build/signal.o build/keyboard.o build/alarm.o build/time.o build/mouse.o build/paging.asm.o build/paging.o build/asm.o
 
 CC_FLAGS = -c -I./ -m32 -ffreestanding -nostdlib -fno-stack-protector -fno-pie -Wall -Werror -Wno-error=return-type
 AS_FLAGS = -f elf32
@@ -19,6 +19,7 @@ all:
 	$(AS) entry.asm -o build/entry.asm.o
 	$(AS) arch/x86/ioport.asm -o build/ioport.asm.o
 	$(AS) kernel/paging.asm -o build/paging.asm.o
+	$(AS) arch/x86/asm.asm -o build/asm.o
 
 	$(CC) arch/x86/gdt.c -o build/gdt.o
 	$(CC) arch/x86/pic.c -o build/pic.o

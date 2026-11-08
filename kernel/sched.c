@@ -15,7 +15,7 @@ void blank()
     while (1)__asm__ volatile ("sti");
 }
 
-struct task_struct* initProc(long pid, void* eip, long page_directory)
+struct task_struct* initProc(long pid, void* eip)
 {
     struct task_struct* newTask = &tasks[pid];
     newTask->pid = pid;
@@ -26,7 +26,6 @@ struct task_struct* initProc(long pid, void* eip, long page_directory)
     newTask->tss.ss0 = 0x10;
     newTask->tss.eip = (long)eip;
     newTask->tss.eflags = 0x202;
-    newTask->tss.cr3 = (long)page_directory;
     newTask->tss.eax = 0;
     newTask->tss.ecx = 0;
     newTask->tss.edx = 0;
@@ -44,6 +43,20 @@ struct task_struct* initProc(long pid, void* eip, long page_directory)
     newTask->tss.fs = DATA_SELECTOR;
     newTask->tss.gs = DATA_SELECTOR;
     newTask->tss.iopb = 0x80000000;
+
+    long offset = 0x00000000;
+    for (int i = 0; i < 1024; i++)
+    {
+        for (int j = 0; j < 1024; j++)
+        {
+            newTask->pcb_page_table[i][j] = offset | 3;
+            offset += 4096;
+        }
+
+        newTask->pcb_page_directory[i] = ((long)newTask->pcb_page_table[i]) | 3;
+    }
+
+    newTask->tss.cr3 = (long)newTask->pcb_page_directory;
 
     setTSSDescriptor(newTask);
 
@@ -118,6 +131,6 @@ int exec(struct task_struct* task)
     _tmp.offset = 0;
     _tmp.selector = selector;
 
-    __asm__ volatile ("ljmp %0" :: "m"(_tmp));
+    __asm__ volatile ("ljmp *%0" :: "m"(_tmp));
     
 }
